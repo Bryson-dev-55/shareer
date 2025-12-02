@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Share</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="min-h-screen bg-black text-white overflow-x-hidden">
+    <!-- Animated Background -->
+    <div class="fixed inset-0 z-0 opacity-20">
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-900 via-black to-blue-900 animate-gradient"></div>
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2 w-80"></div>
+
+    <!-- Login/Signup Modals -->
+    <div id="loginModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-gray-900/90 backdrop-blur-lg border border-purple-500/30 rounded-2xl max-w-md w-full p-8 shadow-2xl">
+                <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
+                        Welcome Back
+                    </h2>
+                    <p class="text-gray-400 text-sm">Login to access Spam Share</p>
+                </div>
+                
+                <form id="loginForm" class="space-y-5">
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-2">Username or Email</label>
+                        <input type="text" id="loginUsername" 
+                            class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-purple-500 text-white"
+                            placeholder="Enter your username" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-2">Password</label>
+                        <div class="relative">
+                            <input type="password" id="loginPassword" 
+                                class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-purple-500 text-white pr-10"
+                                placeholder="Enter your password" required>
+                            <button type="button" onclick="togglePassword('loginPassword')" 
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-2 rounded bg-gray-800 border-gray-700">
+                            <span class="text-sm text-gray-400">Remember me</span>
+                        </label>
+                        <button type="button" onclick="showForgotPassword()" class="text-sm text-purple-400 hover:text-purple-300">
+                            Forgot password?
+                        </button>
+                    </div>
+                    
+                    <button type="submit" 
+                        class="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl font-bold text-white hover:opacity-90 transition">
+                        Login
+                    </button>
+                    
+                    <div class="text-center text-gray-400 text-sm">
+                        Don't have an account? 
+                        <button type="button" onclick="showSignup()" class="text-purple-400 hover:text-purple-300 font-medium">
+                            Sign up
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="signupModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-gray-900/90 backdrop-blur-lg border border-blue-500/30 rounded-2xl max-w-md w-full p-8 shadow-2xl">
+                <button onclick="closeSignupModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+                        Create Account
+                    </h2>
+                    <p class="text-gray-400 text-sm">Join Spam Share community</p>
+                </div>
+                
+                <form id="signupForm" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">First Name</label>
+                            <input type="text" id="signupFirstName" 
+                                class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-white"
+                                placeholder="John" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">Last Name</label>
+                            <input type="text" id="signupLastName" 
+                                class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-white"
+                                placeholder="Doe" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-2">Username</label>
+                        <input type="text" id="signupUsername" 
+                            class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-white"
+                            placeholder="Choose username" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-2">Email</label>
+                        <input type="email" id="signupEmail" 
+                            class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-white"
+                            placeholder="email@example.com" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-2">Password</label>
+                        <div class="relative">
+                            <input type="password" id="signupPassword" 
+                                class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-white pr-10"
+                                placeholder="Create password" required>
+                            <button type="button" onclick="togglePassword('signupPassword')" 
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="mt-2 text-xs text-gray-500">
+                            Password must be at least 8 characters with numbers and symbols
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-2">Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" 
+                            class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 text-white"
+                            placeholder="Confirm password" required>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" id="terms" class="mr-2 rounded bg-gray-800 border-gray-700" required>
+                        <label for="terms" class="text-sm text-gray-400">
+                            I agree to the 
+                            <a href="#" class="text-blue-400 hover:text-blue-300">Terms of Service</a> 
+                            and 
+                            <a href="#" class="text-blue-400 hover:text-blue-300">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" 
+                        class="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl font-bold text-white hover:opacity-90 transition">
+                        Create Account
+                    </button>
+                    
+                    <div class="text-center text-gray-400 text-sm">
+                        Already have an account? 
+                        <button type="button" onclick="showLogin()" class="text-blue-400 hover:text-blue-300 font-medium">
+                            Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-gray-900/90 backdrop-blur-lg border border-green-500/30 rounded-2xl max-w-md w-full p-8 shadow-2xl">
+                <button onclick="closeForgotPasswordModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-key text-green-400 text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Reset Password</h2>
+                    <p class="text-gray-400 text-sm">Enter your email to receive reset instructions</p>
+                </div>
+                
+                <form id="forgotPasswordForm" class="space-y-5">
+                    <div>
+                        <label class="block text-gray-400 text-sm mb-2">Email Address</label>
+                        <input type="email" id="forgotEmail" 
+                            class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-green-500 text-white"
+                            placeholder="email@example.com" required>
+                    </div>
+                    
+                    <button type="submit" 
+                        class="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl font-bold text-white hover:opacity-90 transition">
+                        Send Reset Link
+                    </button>
+                    
+                    <div class="text-center text-gray-400 text-sm">
+                        Remember your password? 
+                        <button type="button" onclick="showLogin()" class="text-green-400 hover:text-green-300 font-medium">
+                            Back to Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Modal -->
+    <div id="sessionModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm">
+        <!-- Same as before -->
+    </div>
+
+    <!-- Main Content -->
+    <div class="relative z-10">
+        <!-- Navigation Bar -->
+        <nav class="bg-gray-900/60 backdrop-blur-xl border-b border-gray-800/50 sticky top-0 z-40">
+            <div class="container mx-auto px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-share-alt text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                            SPAM SHARE
+                        </span>
+                    </div>
+                    
+                    <!-- Navigation Links (Visible when logged in) -->
+                    <div id="navLinks" class="hidden md:flex items-center gap-6">
+                        <a href="#" class="text-gray-300 hover:text-white transition flex items-center gap-2">
+                            <i class="fas fa-home"></i>
+                            Dashboard
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white transition flex items-center gap-2">
+                            <i class="fas fa-history"></i>
+                            History
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white transition flex items-center gap-2">
+                            <i class="fas fa-chart-bar"></i>
+                            Analytics
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white transition flex items-center gap-2">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </a>
+                    </div>
+                    
+                    <!-- User Section -->
+                    <div class="flex items-center gap-4">
+                        <!-- User Info (Visible when logged in) -->
+                        <div id="userInfo" class="hidden items-center gap-3">
+                            <div class="text-right">
+                                <div id="userName" class="text-sm font-medium text-white"></div>
+                                <div id="userPlan" class="text-xs text-gray-400">Premium Plan</div>
+                            </div>
+                            <div class="relative group">
+                                <div id="userAvatar" class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold cursor-pointer">
+                                    <!-- Avatar shows first letter of username -->
+                                </div>
+                                <div class="absolute right-0 mt-2 w-48 bg-gray-900/90 backdrop-blur-lg border border-gray-800 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                                    <div class="p-4 border-b border-gray-800">
+                                        <div class="font-medium text-white" id="dropdownUserName"></div>
+                                        <div class="text-sm text-gray-400" id="dropdownUserEmail"></div>
+                                    </div>
+                                    <div class="p-2">
+                                        <a href="#" class="flex items-center gap-2 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition">
+                                            <i class="fas fa-user text-sm"></i>
+                                            Profile
+                                        </a>
+                                        <a href="#" class="flex items-center gap-2 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition">
+                                            <i class="fas fa-crown text-sm"></i>
+                                            Upgrade Plan
+                                        </a>
+                                        <a href="#" class="flex items-center gap-2 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition">
+                                            <i class="fas fa-cog text-sm"></i>
+                                            Settings
+                                        </a>
+                                        <div class="border-t border-gray-800 my-2"></div>
+                                        <button onclick="logout()" class="w-full flex items-center gap-2 px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition">
+                                            <i class="fas fa-sign-out-alt text-sm"></i>
+                                            Logout
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Login/Signup Buttons (Visible when not logged in) -->
+                        <div id="authButtons" class="flex items-center gap-3">
+                            <button onclick="showLogin()" 
+                                class="px-4 py-2 text-gray-300 hover:text-white transition">
+                                Login
+                            </button>
+                            <button onclick="showSignup()" 
+                                class="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-medium text-white hover:opacity-90 transition">
+                                Sign Up
+                            </button>
+                        </div>
+                        
+                        <!-- Mobile Menu Button -->
+                        <button id="mobileMenuButton" class="md:hidden text-gray-300 hover:text-white">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="md:hidden bg-gray-900/90 backdrop-blur-lg border-t border-gray-800/50 hidden">
+                <div class="container mx-auto px-4 py-4 space-y-3">
+                    <a href="#" class="block text-gray-300 hover:text-white transition py-2">
+                        <i class="fas fa-home mr-3"></i>Dashboard
+                    </a>
+                    <a href="#" class="block text-gray-300 hover:text-white transition py-2">
+                        <i class="fas fa-history mr-3"></i>History
+                    </a>
+                    <a href="#" class="block text-gray-300 hover:text-white transition py-2">
+                        <i class="fas fa-chart-bar mr-3"></i>Analytics
+                    </a>
+                    <a href="#" class="block text-gray-300 hover:text-white transition py-2">
+                        <i class="fas fa-cog mr-3"></i>Settings
+                    </a>
+                    <div class="pt-3 border-t border-gray-800/50">
+                        <div id="mobileUserInfo" class="hidden space-y-2">
+                            <div class="flex items-center gap-3">
+                                <div id="mobileUserAvatar" class="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold"></div>
+                                <div>
+                                    <div id="mobileUserName" class="text-sm font-medium text-white"></div>
+                                    <div id="mobileUserEmail" class="text-xs text-gray-400"></div>
+                                </div>
+                            </div>
+                            <button onclick="logout()" class="w-full flex items-center gap-2 text-red-400 hover:text-red-300">
+                                <i class="fas fa-sign-out-alt"></i>Logout
+                            </button>
+                        </div>
+                        <div id="mobileAuthButtons" class="space-y-2">
+                            <button onclick="showLogin()" class="w-full text-left py-2 text-gray-300 hover:text-white">
+                                Login
+                            </button>
+                            <button onclick="showSignup()" class="w-full py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-medium text-white">
+                                Sign Up
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="container mx-auto max-w-6xl px-4 py-8">
+            <!-- Hero Section (Visible when not logged in) -->
+            <div id="heroSection" class="text-center mb-12 py-12">
+                <h1 class="text-5xl md:text-6xl font-black mb-6 tracking-tighter">
+                    <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent animate-gradient-text">
+                        AUTOMATE YOUR SHARES
+                    </span>
+                </h1>
+                <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                    Powerful Facebook share automation tool. Schedule, monitor, and analyze your sharing campaigns.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="showSignup()" 
+                        class="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl font-bold text-white text-lg hover:scale-105 transition-transform">
+                        <i class="fas fa-rocket mr-2"></i>Start Free Trial
+                    </button>
+                    <button onclick="showLogin()" 
+                        class="px-8 py-4 bg-gray-800 hover:bg-gray-700 rounded-xl font-bold text-white text-lg border border-gray-700">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                </div>
+                
+                <!-- Features Grid -->
+                <div class="grid md:grid-cols-3 gap-6 mt-16">
+                    <div class="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
+                        <div class="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-bolt text-purple-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Fast Automation</h3>
+                        <p class="text-gray-400">Share hundreds of posts in minutes with smart scheduling.</p>
+                    </div>
+                    <div class="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-shield-alt text-blue-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Secure & Private</h3>
+                        <p class="text-gray-400">Your data is encrypted and never shared with third parties.</p>
+                    </div>
+                    <div class="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
+                        <div class="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-chart-line text-green-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Advanced Analytics</h3>
+                        <p class="text-gray-400">Track performance with detailed reports and insights.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard (Visible when logged in) -->
+            <div id="dashboardSection" class="hidden">
+                <!-- Welcome Header -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 class="text-3xl font-bold text-white mb-2">
+                                Welcome back, <span id="dashboardUserName" class="text-purple-400"></span>!
+                            </h1>
+                            <p class="text-gray-400">Here's what's happening with your shares today.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg">
+                                <div class="text-xs text-green-400 mb-1">Plan</div>
+                                <div class="text-sm font-medium text-white">Premium</div>
+                            </div>
+                            <button onclick="showQuickShare()" 
+                                class="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-medium text-white hover:opacity-90 transition flex items-center gap-2">
+                                <i class="fas fa-plus"></i>Quick Share
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-gradient-to-br from-gray-900 to-black/60 backdrop-blur-md rounded-xl border border-gray-800/50 p-5">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Today's Shares</div>
+                                    <div class="text-2xl font-bold text-white">1,245</div>
+                                </div>
+                                <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                                    <i class="fas fa-share-alt text-purple-400"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-gray-800/50">
+                                <div class="text-xs text-green-400">
+                                    <i class="fas fa-arrow-up mr-1"></i>12% from yesterday
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-gray-900 to-black/60 backdrop-blur-md rounded-xl border border-gray-800/50 p-5">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Active Sessions</div>
+                                    <div class="text-2xl font-bold text-white" id="dashboardActiveCount">0</div>
+                                </div>
+                                <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                                    <i class="fas fa-play-circle text-blue-400"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-gray-800/50">
+                                <div class="text-xs text-gray-400">Running now</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-gray-900 to-black/60 backdrop-blur-md rounded-xl border border-gray-800/50 p-5">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Success Rate</div>
+                                    <div class="text-2xl font-bold text-white" id="dashboardSuccessRate">0%</div>
+                                </div>
+                                <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                                    <i class="fas fa-check-circle text-green-400"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-gray-800/50">
+                                <div class="text-xs text-gray-400">Average accuracy</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-gray-900 to-black/60 backdrop-blur-md rounded-xl border border-gray-800/50 p-5">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Total Processed</div>
+                                    <div class="text-2xl font-bold text-white" id="dashboardProcessedCount">0</div>
+                                </div>
+                                <div class="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                                    <i class="fas fa-chart-line text-cyan-400"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-gray-800/50">
+                                <div class="text-xs text-gray-400">All time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Content -->
+                <div class="space-y-8">
+                    <!-- Original Content Here (Same as before) -->
+                    <!-- Single Column Layout -->
+                    <div class="space-y-8">
+                        <!-- Main Form Card -->
+                        <div class="bg-gray-900/60 backdrop-blur-xl rounded-2xl border border-gray-800/50 p-6 shadow-2xl">
+                            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-800/50">
+                                <div class="w-2 h-6 bg-gradient-to-b from-purple-500 to-blue-500 rounded-full"></div>
+                                <h2 class="text-lg font-bold text-purple-300 tracking-wide">NEW SHARE TASK</h2>
+                                <div class="ml-auto">
+                                    <div class="px-3 py-1 bg-gray-800 rounded-full text-xs text-gray-300">
+                                        <i class="fas fa-bolt text-yellow-400 mr-1"></i>
+                                        <span id="active-sessions-count">0</span> Active
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form onsubmit="submitForm(event)" class="space-y-5">
+                                <!-- APPSTATE -->
+                                <div>
+                                    <label class="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                                        <i class="fas fa-key text-purple-400 text-xs"></i>
+                                        APPSTATE
+                                        <span class="ml-auto text-xs text-gray-500 cursor-help" title="Paste your Facebook appstate JSON">
+                                            <i class="fas fa-info-circle"></i>
+                                        </span>
+                                    </label>
+                                    <div class="relative">
+                                        <input 
+                                            type="text" 
+                                            id="cookies" 
+                                            name="cookie" 
+                                            placeholder='[{"key": "sb", "value": "..."}, ...]'
+                                            class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-sm text-white placeholder-gray-500 transition-all"
+                                        >
+                                        <button type="button" onclick="clearField('cookies')" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- LINK -->
+                                <div>
+                                    <label class="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                                        <i class="fas fa-link text-blue-400 text-xs"></i>
+                                        FACEBOOK POST LINK
+                                    </label>
+                                    <div class="relative">
+                                        <input 
+                                            type="text" 
+                                            id="urls" 
+                                            name="url" 
+                                            placeholder="https://facebook.com/username/posts/123456789"
+                                            class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-sm text-white placeholder-gray-500 transition-all"
+                                        >
+                                        <button type="button" onclick="clearField('urls')" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Compact Grid for Limit & Delay -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                                            <i class="fas fa-bullseye text-pink-400 text-xs"></i>
+                                            SHARE TARGET
+                                        </label>
+                                        <div class="relative">
+                                            <input 
+                                                type="number" 
+                                                id="amounts" 
+                                                name="amount" 
+                                                placeholder="100"
+                                                min="1"
+                                                max="1000"
+                                                class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 text-sm text-white placeholder-gray-500 transition-all"
+                                            >
+                                            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs">
+                                                shares
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                                            <i class="fas fa-clock text-cyan-400 text-xs"></i>
+                                            DELAY (SECONDS)
+                                        </label>
+                                        <div class="relative">
+                                            <input 
+                                                type="number" 
+                                                id="intervals" 
+                                                name="interval" 
+                                                placeholder="5"
+                                                min="1"
+                                                max="60"
+                                                class="w-full px-4 py-3 bg-black/40 border border-gray-700 rounded-xl focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 text-sm text-white placeholder-gray-500 transition-all"
+                                            >
+                                            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs">
+                                                sec
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Button with Loading State -->
+                                <div class="pt-2">
+                                    <button 
+                                        type="submit" 
+                                        id="submit-button"
+                                        class="w-full group"
+                                    >
+                                        <div class="px-6 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-xl font-bold text-white shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3">
+                                            <i class="fas fa-rocket text-lg group-hover:rotate-12 transition-transform"></i>
+                                            <span class="tracking-wider text-sm">LAUNCH SHARE BOT</span>
+                                            <div id="button-loader" class="hidden">
+                                                <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                            </div>
+                                        </div>
+                                    </button>
+                                    
+                                    <div id="result" class="mt-4 hidden"></div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Stats Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <!-- Total Processed -->
+                            <div class="bg-gradient-to-br from-gray-900 to-black/60 backdrop-blur-md rounded-xl border border-gray-800/50 p-5 hover:border-purple-500/30 transition-all hover:scale-[1.02] cursor-pointer" onclick="showToast('Total shares processed so far', 'info')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Processed</div>
+                                        <div id="processed-count" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">0</div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center group">
+                                        <i class="fas fa-chart-line text-cyan-400 text-lg group-hover:scale-110 transition-transform"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-gray-800/50">
+                                    <div class="text-gray-500 text-xs">Total successful shares</div>
+                                </div>
+                            </div>
+
+                            <!-- Active Sessions -->
+                            <div class="bg-gradient-to-br from-gray-900 to-black/60 backdrop-blur-md rounded-xl border border-gray-800/50 p-5 hover:border-purple-500/30 transition-all hover:scale-[1.02] cursor-pointer" onclick="showActiveSessions()">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Active</div>
+                                        <div id="active-count" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">0</div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center group">
+                                        <i class="fas fa-play-circle text-purple-400 text-lg group-hover:scale-110 transition-transform"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-gray-800/50">
+                                    <div class="text-gray-500 text-xs">Running sessions</div>
+                                </div>
+                            </div>
+
+                            <!-- Success Rate -->
+                            <div class="bg-gradient-to-br from-gray-900 to-black/60 backdrop-blur-md rounded-xl border border-gray-800/50 p-5 hover:border-green-500/30 transition-all hover:scale-[1.02] cursor-pointer" onclick="showToast('Percentage of successful shares', 'info')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Success Rate</div>
+                                        <div id="success-rate" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">0%</div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center group">
+                                        <i class="fas fa-check-circle text-green-400 text-lg group-hover:scale-110 transition-transform"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-gray-800/50">
+                                    <div class="text-gray-500 text-xs">Share accuracy</div>
+                                </div>
+                            </div>
+
+                            <!-- Total Shares -->
+                            <div class="bg-gradient-to-br from-gray-900 to-black/60 backdrop-blur-md rounded-xl border border-gray-800/50 p-5 hover:border-blue-500/30 transition-all hover:scale-[1.02] cursor-pointer" onclick="showToast('Total shares attempted', 'info')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Total</div>
+                                        <div id="total-shares" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">0</div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center group">
+                                        <i class="fas fa-share-alt text-blue-400 text-lg group-hover:scale-110 transition-transform"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-gray-800/50">
+                                    <div class="text-gray-500 text-xs">All attempts</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terminal Section -->
+                        <div class="bg-gray-900/60 backdrop-blur-xl rounded-2xl border border-gray-800/50 p-6 shadow-2xl">
+                            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-800/50">
+                                <div class="w-2 h-6 bg-gradient-to-b from-green-500 to-cyan-500 rounded-full"></div>
+                                <h2 class="text-lg font-bold text-cyan-300">SYSTEM TERMINAL</h2>
+                                <div class="ml-auto flex gap-2">
+                                    <button onclick="clearTerminal()" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-xs text-gray-300 transition">
+                                        <i class="fas fa-trash mr-1"></i>Clear
+                                    </button>
+                                    <button onclick="toggleTerminal()" id="terminal-toggle" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-xs text-gray-300 transition">
+                                        <i class="fas fa-expand mr-1"></i>Expand
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="terminal" class="bg-black/40 rounded-xl p-4 font-mono text-sm h-80 overflow-y-auto custom-scrollbar transition-all">
+                                <div id="terminal-content">
+                                    <div id="terminal-lines" class="space-y-1"></div>
+                                    <div id="typing-cursor" class="inline-block text-green-400">█</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex items-center justify-between text-xs text-gray-500">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                        <span>Success</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                                        <span>Error</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                                        <span>Warning</span>
+                                    </div>
+                                </div>
+                                <div class="font-mono">
+                                    <span id="terminal-time">00:00:00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="text-center pt-8 border-t border-gray-800/30">
+                            <div class="text-sm text-gray-500 mb-3">
+                                <span class="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent font-bold">SPAM SHARE</span>
+                                <span class="mx-3">•</span>
+                                <span>Advanced Automation Tool</span>
+                            </div>
+                            <div class="text-xs text-gray-600">
+                                <span>© 2025 Spam Share</span>
+                                <span class="mx-2">•</span>
+                                <span class="text-purple-400">Creator: Bryson</span>
+                                <span class="mx-2">•</span>
+                                <span>All rights reserved</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .animate-gradient {
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        .animate-gradient-text {
+            background-size: 400% 400%;
+            animation: gradient 8s ease infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .terminal-line {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            padding: 2px 0;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .typing-text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid transparent;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #typing-cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #8b5cf6, #3b82f6);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #7c3aed, #2563eb);
+        }
+
+        .toast {
+            animation: slideUp 0.3s ease-out, fadeIn 0.3s ease-out;
+        }
+
+        .progress-bar {
+            animation: shrink 5s linear forwards;
+        }
+
+        @keyframes shrink {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+
+        input:focus {
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+    </style>
+
+    <script src="script.js"></script>
+</body>
+</html>
